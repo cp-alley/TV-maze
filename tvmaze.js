@@ -110,26 +110,30 @@ async function getEpisodesOfShow(id) {
 }
 
 /** Given list of episodes, display DISPLAY_MAX_EPISODES in episode area */
-//TODO: epsiodes.length if statement
+
 function displayEpisodes(episodes) {
   $episodesArea.empty();
 
   const maxEpisodes = episodes.length < DISPLAY_MAX_EPISODES
     ? episodes.length : DISPLAY_MAX_EPISODES;
 
-    for (let i = 0; i < maxEpisodes; i++) {
-      const $episode = $(`
-    <li id="${episodes[i].id}">${episodes[i].name} (season ${episodes[i].season},
+  for (let i = 0; i < maxEpisodes; i++) {
+    const $episode = $(`
+    <li id="${episodes[i].id}">${episodes[i].name}
+    (season ${episodes[i].season},
       number ${episodes[i].number})</li>
     `);
 
-      $episodesArea.append($episode);
-    };
+    $episodesArea.append($episode);
+  };
 }
 
-// add other functions that will be useful / match our structure & design
 
-async function searchAndDisplayEpisodes(id){
+/** Gets episodes from API based on ID of show.
+ * Displays episodes.
+ */
+
+async function searchAndDisplayEpisodes(id) {
   const episodes = await getEpisodesOfShow(id);
 
   $episodesArea.show();
@@ -137,9 +141,15 @@ async function searchAndDisplayEpisodes(id){
 
 }
 
-$showsList.on("click", "button", (evt) => {
-  const id = evt.closest('data-show-id');
-  searchAndDisplayEpisodes(id);
+/** Handle click of show episodes button.
+ * Get ID of that show to get correct episodes.
+ */
 
+$showsList.on("click", "button", async function handleClick(evt) {
+  const id = $(evt.target).closest('[data-show-id]').data().showId;
+  console.log("id=", id);
+
+  searchAndDisplayEpisodes(id);
 })
 
+//.attr("data-show-id")
