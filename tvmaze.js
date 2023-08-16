@@ -5,6 +5,7 @@ const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 const TV_MAZE_BASE_URL = "http://api.tvmaze.com";
 const DEFAULT_IMG_URL = "https://tinyurl.com/tv-missing";
+const DISPLAY_MAX_EPISODES = 10;
 
 
 /** Given a search term, search for tv shows that match that query.
@@ -96,7 +97,7 @@ async function getEpisodesOfShow(id) {
 
   console.log(data);
 
-  data.map(episode => (
+  return data.map(episode => (
     {
       id : episode.id,
       name : episode.name,
@@ -108,8 +109,20 @@ async function getEpisodesOfShow(id) {
   ))
 }
 
-/** Write a clear docstring for this function... */
+/** Given list of episodes, display DISPLAY_MAX_EPISODES in episode area */
+//TODO: epsiodes.length if statement
+function displayEpisodes(episodes) {
+  $episodesArea.empty()
+  $episodesArea.css("display", "block")
 
-// function displayEpisodes(episodes) { }
+  for (let i=0; i < DISPLAY_MAX_EPISODES; i++) {
+    const $episode = $(`
+    <li id="${episodes[i].id}">${episodes[i].name} (season ${episodes[i].season},
+      number ${episodes[i].number})</li>
+    `)
+
+    $episodesArea.append($episode)
+  };
+}
 
 // add other functions that will be useful / match our structure & design
