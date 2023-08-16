@@ -4,37 +4,34 @@ const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 const TV_MAZE_BASE_URL = "http://api.tvmaze.com";
-const DEFAULT_IMG_URL = "https://static.tvmaze.com/uploads/images/medium_portrait/271/678637.jpg";
+const DEFAULT_IMG_URL = "https://tinyurl.com/tv-missing";
 
 
 /** Given a search term, search for tv shows that match that query.
  *
  *  Returns (promise) array of show objects: [show, show, ...].
- *    Each show object should contain exactly: {id, name, summary, image}
- *    (if no image URL given by API, put in a default image URL)
  */
 
 async function getShowsByTerm(searchTerm) {
-  // ADD: Remove placeholder & make request to TVMaze search shows API.
+
   const params = new URLSearchParams({ q: searchTerm });
   const response = await fetch(`${TV_MAZE_BASE_URL}/search/shows?${params}`);
   console.log("response=", response);
   const showsData = await response.json();
 
-
-  //For each entry in the showsData array, return an object with just id, name,
-  // summary, image properties.
   return showsData.map(showEntry => (
+    // pull showEntry.show out to a variable
     {
       id: showEntry.show.id,
       name: showEntry.show.name,
       summary: showEntry.show.summary,
       image: (showEntry.show.image !== null)
-      ? showEntry.show.image.medium
-      : DEFAULT_IMG_URL
+        ? showEntry.show?.image.medium
+        : DEFAULT_IMG_URL
     }
   ));
 }
+// optional chaining - insert ?
 
 
 /** Given list of shows, create markup for each and append to DOM.
@@ -50,8 +47,8 @@ function displayShows(shows) {
         <div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img
-              src="http://static.tvmaze.com/uploads/images/medium_portrait/160/401704.jpg"
-              alt="Bletchly Circle San Francisco"
+              src="${show.image}"
+              alt="${show.name}"
               class="w-25 me-3">
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
@@ -91,7 +88,25 @@ $searchForm.on("submit", async function handleSearchForm(evt) {
  *      { id, name, season, number }
  */
 
-// async function getEpisodesOfShow(id) { }
+async function getEpisodesOfShow(id) {
+
+  // const params = new URLSearchParams (id);
+  const response = await fetch (`${TV_MAZE_BASE_URL}/shows/${id}/episodes`);
+  const data = await response.json();
+
+  console.log(data);
+
+  data.map(episode => (
+    {
+      id : episode.id,
+      name : episode.name,
+      season : episode.season,
+      number : episode.number
+
+    }
+
+  ))
+}
 
 /** Write a clear docstring for this function... */
 
