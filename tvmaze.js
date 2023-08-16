@@ -92,37 +92,54 @@ $searchForm.on("submit", async function handleSearchForm(evt) {
 async function getEpisodesOfShow(id) {
 
   // const params = new URLSearchParams (id);
-  const response = await fetch (`${TV_MAZE_BASE_URL}/shows/${id}/episodes`);
+  const response = await fetch(`${TV_MAZE_BASE_URL}/shows/${id}/episodes`);
   const data = await response.json();
 
   console.log(data);
 
   return data.map(episode => (
     {
-      id : episode.id,
-      name : episode.name,
-      season : episode.season,
-      number : episode.number
+      id: episode.id,
+      name: episode.name,
+      season: episode.season,
+      number: episode.number
 
     }
 
-  ))
+  ));
 }
 
 /** Given list of episodes, display DISPLAY_MAX_EPISODES in episode area */
 //TODO: epsiodes.length if statement
 function displayEpisodes(episodes) {
-  $episodesArea.empty()
-  $episodesArea.css("display", "block")
+  $episodesArea.empty();
 
-  for (let i=0; i < DISPLAY_MAX_EPISODES; i++) {
-    const $episode = $(`
+  const maxEpisodes = episodes.length < DISPLAY_MAX_EPISODES
+    ? episodes.length : DISPLAY_MAX_EPISODES;
+
+    for (let i = 0; i < maxEpisodes; i++) {
+      const $episode = $(`
     <li id="${episodes[i].id}">${episodes[i].name} (season ${episodes[i].season},
       number ${episodes[i].number})</li>
-    `)
+    `);
 
-    $episodesArea.append($episode)
-  };
+      $episodesArea.append($episode);
+    };
 }
 
 // add other functions that will be useful / match our structure & design
+
+async function searchAndDisplayEpisodes(id){
+  const episodes = await getEpisodesOfShow(id);
+
+  $episodesArea.show();
+  displayEpisodes(episodes);
+
+}
+
+$showsList.on("click", "button", (evt) => {
+  const id = evt.closest('data-show-id');
+  searchAndDisplayEpisodes(id);
+
+})
+
