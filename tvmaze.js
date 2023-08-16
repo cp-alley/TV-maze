@@ -3,7 +3,8 @@
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
-const TV_MAZE_BASE_URL = "http://api.tvmaze.com"
+const TV_MAZE_BASE_URL = "http://api.tvmaze.com";
+const DEFAULT_IMG_URL = "https://static.tvmaze.com/uploads/images/medium_portrait/271/678637.jpg";
 
 
 /** Given a search term, search for tv shows that match that query.
@@ -15,7 +16,7 @@ const TV_MAZE_BASE_URL = "http://api.tvmaze.com"
 
 async function getShowsByTerm(searchTerm) {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
-  const params = new URLSearchParams({q:searchTerm});
+  const params = new URLSearchParams({ q: searchTerm });
   const response = await fetch(`${TV_MAZE_BASE_URL}/search/shows?${params}`);
   console.log("response=", response);
   const showsData = await response.json();
@@ -23,7 +24,16 @@ async function getShowsByTerm(searchTerm) {
 
   //For each entry in the showsData array, return an object with just id, name,
   // summary, image properties.
-  return showsData[0].show;
+  return showsData.map(showEntry => (
+    {
+      id: showEntry.show.id,
+      name: showEntry.show.name,
+      summary: showEntry.show.summary,
+      image: (showEntry.show.image !== null)
+      ? showEntry.show.image.medium
+      : DEFAULT_IMG_URL
+    }
+  ));
 }
 
 
@@ -71,7 +81,7 @@ async function searchShowsAndDisplay() {
   displayShows(shows);
 }
 
-$searchForm.on("submit", async function handleSearchForm (evt) {
+$searchForm.on("submit", async function handleSearchForm(evt) {
   evt.preventDefault();
   await searchShowsAndDisplay();
 });
